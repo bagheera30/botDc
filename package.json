@@ -1,0 +1,17 @@
+{
+  "name": "dc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bot.js",
+  "scripts": {
+    "test": "nodemon bot.js"
+  },
+  "author": "Bagheera",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.22"
+  }
+}
