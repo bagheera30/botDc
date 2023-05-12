@@ -42,11 +42,11 @@ jobs:
         port: 22
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-          cd ~/home/testserver1/bot_dasar 
+          cd ~/home/testserver1/bot_dasar
           git pull origin master
           git status
           npm install
-          pm2 restart botDc
+          pm2 restart botdc
         
     
     
