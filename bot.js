@@ -1,5 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
+const ytdl = require("ytdl-core");
 const { Client, IntentsBitField, MessageEmbed } = require("discord.js");
 
 const client = new Client({
@@ -51,6 +52,32 @@ client.on("messageCreate", async (message) => {
     const password = generatePassword(length);
     message.author.send(`Kata sandi baru: ${password}`);
     message.reply("Kata sandi baru telah dikirim melalui pesan pribadi (DM).");
+  }
+  if (message.content.startsWith("/download")) {
+    const url = message.content.split(" ")[1];
+
+    if (!url) {
+      message.reply("Please provide a valid YouTube URL.");
+      return;
+    }
+
+    try {
+      const info = await ytdl.getInfo(url);
+      const audio = ytdl(url, { filter: "audioonly" });
+
+      const stream = audio.on("error", (error) => {
+        console.error("Error downloading audio:", error);
+        message.reply("An error occurred while downloading the audio.");
+      });
+
+      message.reply({
+        content: `${info.videoDetails.title}`,
+        files: [{ attachment: stream, name: `${info.videoDetails.title}.mp3` }],
+      });
+    } catch (error) {
+      console.error("Error downloading audio:", error);
+      message.reply("An error occurred while downloading the audio.");
+    }
   }
 
   if (message.content === "/news") {
