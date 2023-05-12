@@ -1,6 +1,6 @@
 require("dotenv").config();
 const axios = require("axios");
-const { Client, IntentsBitField } = require("discord.js");
+const { Client, IntentsBitField, MessageEmbed } = require("discord.js");
 
 const client = new Client({
   intents: [
@@ -21,9 +21,17 @@ client.on("messageCreate", async (message) => {
   }
 
   if (message.content === "/ping") {
-    message.reply("hai");
-  }
+    const user = message.author;
 
+    const embed = {
+      color: 0x0099ff,
+      title: "User Information",
+      description: `Username: ${user.username}\nTag: ${user.tag}\nUser ID: ${user.id}`,
+      thumbnail: { url: user.displayAvatarURL() },
+    };
+
+    message.reply({ embeds: [embed] });
+  }
   if (message.content.startsWith("/password")) {
     const args = message.content.split(" ");
     const length = parseInt(args[1]);
