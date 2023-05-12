@@ -73,6 +73,39 @@ client.on("messageCreate", async (message) => {
       );
     }
   }
+  if (message.content.startsWith("/clear")) {
+    const args = message.content.split(" ");
+    const time = parseInt(args[1]);
+
+    if (isNaN(time) || time <= 0) {
+      message.reply("Mohon masukkan jangka waktu yang valid dalam menit!");
+      return;
+    }
+
+    const channel = message.channel;
+
+    try {
+      const fetchedMessages = await channel.messages.fetch({ limit: 100 });
+      const filteredMessages = fetchedMessages.filter(
+        (msg) => !msg.pinned && Date.now() - msg.createdTimestamp < time * 60000
+      );
+
+      if (filteredMessages.size === 0) {
+        message.reply("Tidak ada pesan yang memenuhi kriteria untuk dihapus.");
+        return;
+      }
+
+      await channel.bulkDelete(filteredMessages, true);
+      message.reply(
+        `Pesan dalam saluran ini yang lebih baru dari ${time} menit telah dihapus.`
+      );
+    } catch (error) {
+      console.error("Error:", error);
+      message.reply(
+        "Terjadi kesalahan dalam menghapus pesan. Mohon coba lagi nanti."
+      );
+    }
+  }
 });
 
 function generatePassword(length) {
