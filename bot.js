@@ -2,6 +2,7 @@ require("dotenv").config();
 const axios = require("axios");
 const ytdl = require("ytdl-core");
 const { Client, IntentsBitField, MessageEmbed } = require("discord.js");
+const { EventEmitter } = require("events");
 
 const client = new Client({
   intents: [
@@ -64,15 +65,35 @@ client.on("messageCreate", async (message) => {
     try {
       const info = await ytdl.getInfo(url);
       const audio = ytdl(url, { filter: "audioonly" });
+      const eventEmitter = new EventEmitter();
+      let progress = 0;
+
+      audio.on("progress", (_, downloaded, total) => {
+        const newProgress = Math.floor((downloaded / total) * 100);
+        if (newProgress !== progress) {
+          progress = newProgress;
+          eventEmitter.emit("progress", progress);
+        }
+      });
 
       const stream = audio.on("error", (error) => {
         console.error("Error downloading audio:", error);
         message.reply("An error occurred while downloading the audio.");
       });
 
-      message.reply({
-        content: `${info.videoDetails.title}`,
-        files: [{ attachment: stream, name: `${info.videoDetails.title}.mp3` }],
+      message.reply("Downloading audio...").then((reply) => {
+        eventEmitter.on("progress", (progress) => {
+          reply.edit(`Downloading audio... ${progress}%`);
+        });
+
+        const attachment = {
+          attachment: stream,
+          name: `${info.videoDetails.title}.mp3`,
+        };
+        message.channel.send({
+          content: `${info.videoDetails.title}`,
+          files: [attachment],
+        });
       });
     } catch (error) {
       console.error("Error downloading audio:", error);
