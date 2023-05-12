@@ -14,6 +14,15 @@ const client = new Client({
 client.on("ready", () => {
   console.log(`${client.user.tag} is online`);
 });
+client.on("guildMemberAdd", (member) => {
+  const welcomeMessage =
+    "Selamat datang di server! Terima kasih telah bergabung.";
+
+  member
+    .send(welcomeMessage)
+    .then(() => console.log(`Sent welcome message to ${member.user.tag}`))
+    .catch((error) => console.error("Error sending welcome message:", error));
+});
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) {
@@ -41,7 +50,8 @@ client.on("messageCreate", async (message) => {
     }
 
     const password = generatePassword(length);
-    message.reply(`Kata sandi baru: ${password}`);
+    message.author.send(`Kata sandi baru: ${password}`);
+    message.reply("Kata sandi baru telah dikirim melalui pesan pribadi (DM).");
   }
 
   if (message.content === "/news") {
