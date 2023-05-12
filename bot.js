@@ -1,15 +1,19 @@
 require("dotenv").config();
 const axios = require("axios");
 const ytdl = require("ytdl-core");
-const { Client, IntentsBitField, MessageEmbed } = require("discord.js");
-const { EventEmitter } = require("events");
+const {
+  Client,
+  Intents,
+  MessageAttachment,
+  MessageEmbed,
+} = require("discord.js");
 
 const client = new Client({
   intents: [
-    IntentsBitField.Flags.Guilds,
-    IntentsBitField.Flags.GuildMembers,
-    IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.MessageContent,
+    Intents.FLAGS.Guilds,
+    Intents.FLAGS.GuildMembers,
+    Intents.FLAGS.GuildMessages,
+    Intents.FLAGS.MessageContent,
   ],
 });
 
@@ -18,22 +22,22 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (message) => {
-  if (message.author.bot) {
-    return;
-  }
+  if (message.author.bot) return;
 
   if (message.content === "/ping") {
     const user = message.author;
 
-    const embed = {
-      color: 0x0099ff,
-      title: "INFORMASI DARI:",
-      description: `Username: ${user.username}\nTag: ${user.tag}\nUser ID: ${user.id}`,
-      thumbnail: { url: user.displayAvatarURL() },
-    };
+    const embed = new MessageEmbed()
+      .setColor(0x0099ff)
+      .setTitle("INFORMASI DARI:")
+      .setDescription(
+        `Username: ${user.username}\nTag: ${user.tag}\nUser ID: ${user.id}`
+      )
+      .setThumbnail(user.displayAvatarURL());
 
     message.reply({ embeds: [embed] });
   }
+
   if (message.content.startsWith("/password")) {
     const args = message.content.split(" ");
     const length = parseInt(args[1]);
@@ -54,55 +58,35 @@ client.on("messageCreate", async (message) => {
     message.author.send(`Kata sandi baru: ${password}`);
     message.reply("Kata sandi baru telah dikirim melalui pesan pribadi (DM).");
   }
+
   if (message.content.startsWith("/download")) {
     const url = message.content.split(" ")[1];
 
     if (!url) {
-      message.reply("Please provide a valid YouTube URL.");
+      message.reply("Mohon berikan URL YouTube yang valid.");
       return;
     }
 
     try {
       const info = await ytdl.getInfo(url);
       const audio = ytdl(url, { filter: "audioonly" });
-      const eventEmitter = new EventEmitter();
-      let progress = 0;
 
-      audio.on("progress", (_, downloaded, total) => {
-        const newProgress = Math.floor((downloaded / total) * 100);
-        if (newProgress !== progress) {
-          progress = newProgress;
-          eventEmitter.emit("progress", progress);
-        }
-      });
-
-      const stream = audio.on("error", (error) => {
-        console.error("Error downloading audio:", error);
-        message.reply("An error occurred while downloading the audio.");
-      });
-
-      message.reply("Downloading audio...").then((reply) => {
-        eventEmitter.on("progress", (progress) => {
-          reply.edit(`Downloading audio... ${progress}%`);
-        });
-
-        const attachment = {
-          attachment: stream,
-          name: `${info.videoDetails.title}.mp3`,
-        };
-        message.channel.send({
-          content: `${info.videoDetails.title}`,
-          files: [attachment],
-        });
+      const attachment = new MessageAttachment(
+        await audio,
+        `${info.videoDetails.title}.mp3`
+      );
+      message.channel.send({
+        content: `${info.videoDetails.title}`,
+        files: [attachment],
       });
     } catch (error) {
       console.error("Error downloading audio:", error);
-      message.reply("An error occurred while downloading the audio.");
+      message.reply("Terjadi kesalahan saat mengunduh audio.");
     }
   }
 
   if (message.content === "/news") {
-    const API_KEY = process.env.NEWS_API_KEY; // Ganti YOUR_API_KEY dengan kunci API NewsAPI Anda yang valid
+    const API_KEY = process.env.NEWS_API_KEY;
 
     try {
       const response = await axios.get(
@@ -129,10 +113,10 @@ client.on("messageCreate", async (message) => {
       );
     }
   }
+
   if (message.content.startsWith("/clear")) {
     const args = message.content.split(" ");
     const time = parseInt(args[1]);
-
     if (isNaN(time) || time <= 0) {
       message.reply("Mohon masukkan jangka waktu yang valid dalam menit!");
       return;
@@ -163,11 +147,11 @@ client.on("messageCreate", async (message) => {
     }
   }
 });
-
 function generatePassword(length) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let password = "";
+
   const maxLength = Math.min(length, 200);
 
   for (let i = 0; i < maxLength; i++) {
