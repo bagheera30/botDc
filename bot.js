@@ -25,7 +25,7 @@ client.on("messageCreate", async (message) => {
 
     const embed = {
       color: 0x0099ff,
-      title: "User Information",
+      title: "INFORMASI DARI:",
       description: `Username: ${user.username}\nTag: ${user.tag}\nUser ID: ${user.id}`,
       thumbnail: { url: user.displayAvatarURL() },
     };
