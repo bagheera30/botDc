@@ -1,27 +1,18 @@
 require("dotenv").config();
 const axios = require("axios");
-const { Client, Intents } = require("discord.js");
+const { Client, IntentsBitField } = require("discord.js");
 
 const client = new Client({
   intents: [
-    Intents.FLAGS.Guilds,
-    Intents.FLAGS.GuildMembers,
-    Intents.FLAGS.GuildMessages,
-    Intents.FLAGS.MessageContent,
+    IntentsBitField.Flags.Guilds,
+    IntentsBitField.Flags.GuildMembers,
+    IntentsBitField.Flags.GuildMessages,
+    IntentsBitField.Flags.MessageContent,
   ],
 });
 
 client.on("ready", () => {
   console.log(`${client.user.tag} is online`);
-});
-client.on("guildMemberAdd", (member) => {
-  const welcomeMessage =
-    "Selamat datang di server! Terima kasih telah bergabung.";
-
-  member
-    .send(welcomeMessage)
-    .then(() => console.log(`Sent welcome message to ${member.user.tag}`))
-    .catch((error) => console.error("Error sending welcome message:", error));
 });
 
 client.on("messageCreate", async (message) => {
