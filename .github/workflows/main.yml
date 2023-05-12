@@ -46,7 +46,7 @@ jobs:
           git pull origin master
           git status
           npm install
-          pm2 restart botDc
+          pm2 restart botdc
         
     
     
