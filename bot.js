@@ -3,17 +3,17 @@ const axios = require("axios");
 const ytdl = require("ytdl-core");
 const {
   Client,
-  Intents,
+  IntentsBitField,
   MessageAttachment,
   MessageEmbed,
 } = require("discord.js");
 
 const client = new Client({
   intents: [
-    Intents.FLAGS.Guilds,
-    Intents.FLAGS.GuildMembers,
-    Intents.FLAGS.GuildMessages,
-    Intents.FLAGS.MessageContent,
+    IntentsBitField.FLAGS.Guilds,
+    IntentsBitField.FLAGS.GuildMembers,
+    IntentsBitField.FLAGS.GuildMessages,
+    IntentsBitField.FLAGS.MessageContent,
   ],
 });
 
